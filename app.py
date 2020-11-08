@@ -1,12 +1,8 @@
 from flask import Flask, request, make_response, jsonify
 import time
 import datetime
-# from fuzzysearch import find_near_matches
-
 from nsetools import Nse
 from pprint import pprint
-
-# importing the module 
 import json 
 
 app = Flask(__name__)
@@ -17,34 +13,24 @@ def index():
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
-    nse = Nse()
-    # Opening JSON file 
+    nse = Nse() 
     with open('symbols.json') as json_file: 
         symbol_data = json.load(json_file) 
-  
     req = request.get_json(silent=True, force=True)
-    print(req)
-
     query_result = req.get('queryResult').get('parameters')
     price_type = query_result.get('price_type')
     company_name = query_result.get('company_name')
     date_time = query_result.get('date-time')
-
-
     if isinstance(date_time, str):
         s = date_time.split("T")[0]
         unix_time = int(time.mktime(datetime.datetime.strptime(s, "%Y-%m-%d").timetuple()))
     else:
         s = date_time['date_time'].split("T")[0]
-        unix_time = int(time.mktime(datetime.datetime.strptime(s, "%Y-%m-%d").timetuple()))
-    
+        unix_time = int(time.mktime(datetime.datetime.strptime(s, "%Y-%m-%d").timetuple())) 
     start_date = unix_time
     end_date = unix_time + 86399
     try:
         company_symbol = symbol_data[company_name]
-        # with open('symbols.json', 'rb') as f:
-        #     print(find_near_matches_in_file(company_name, f, max_l_dist=1))
-
     except:
         return {
             "fulfillmentText": "Sorry! This company does not belong to NSE.",
