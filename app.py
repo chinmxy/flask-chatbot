@@ -4,6 +4,7 @@ import datetime
 from nsetools import Nse
 from pprint import pprint
 import json 
+from newsapi import NewsApiClient
 
 app = Flask(__name__)
 
@@ -18,6 +19,8 @@ def webhook():
         symbol_data = json.load(json_file)
     with open('inv_symbols.json') as json_file: 
         inv_symbol_data = json.load(json_file)
+    # newsapi = NewsApiClient(api_key='cc0446450bcc4e46a91abd02e33d5f85')
+    
     req = request.get_json(silent=True, force=True)
     query_result = req.get('queryResult')
     if query_result.get('action') == 'get_stock_price':
@@ -92,6 +95,9 @@ def webhook():
             "source": "webhookdata"
         }
     elif query_result.get('action') == 'get_news':
+        # sources = newsapi.get_sources()
+        # print(sources)
+        print("here")
         return {
             "fulfillmentText": "Hellew",
             "displayText": '25',
