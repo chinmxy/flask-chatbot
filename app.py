@@ -103,6 +103,12 @@ def webhook():
         company_name = query_result.get('parameters').get('company_name')
         all_articles = newsapi.get_everything(q=company_name, sources='bbc-news,the-verge,the-times-of-india',language='en', sort_by='relevancy')
         articles = all_articles.get('articles')
+        if len(articles) == 0:
+            return {
+            "fulfillmentText": "Sorry! Could not find any relevant news.",
+            "displayText": '25',
+            "source": "webhookdata"
+            }
         article = articles[random.randint(0, len(articles)-1)]
         # pprint(article)
         title = article.get('title')
@@ -132,7 +138,27 @@ def webhook():
         return jsonify({
             "fulfillmentMessages": response
         })
+    
+    elif query_result.get('action') == 'get_index_quote':
+        index_code = query_result.get('parameters').get('index_codes')
+        if index_code == "":
+            op_string = 'Try again using a valid Index code.'
+        else:
+            index_quote = nse.get_index_quote(index_code).get('lastPrice')
+            op_string = "The last updated price of {} is Rs.{}.".format(index_code, index_quote)
 
+        return {
+            "fulfillmentText": op_string,
+            "displayText": '25',
+            "source": "webhookdata"
+        }
+
+    # elif query_result.get('action') == 'get_index_quote':
+    #     return {
+    #         "fulfillmentText": op_string,
+    #         "displayText": '25',
+    #         "source": "webhookdata"
+    #     }
 
 
 
