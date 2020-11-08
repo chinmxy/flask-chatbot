@@ -5,6 +5,9 @@ from nsetools import Nse
 from pprint import pprint
 import json 
 from newsapi import NewsApiClient
+import random
+
+
 
 app = Flask(__name__)
 
@@ -19,10 +22,11 @@ def webhook():
         symbol_data = json.load(json_file)
     with open('inv_symbols.json') as json_file: 
         inv_symbol_data = json.load(json_file)
-    # newsapi = NewsApiClient(api_key='cc0446450bcc4e46a91abd02e33d5f85')
+    newsapi = NewsApiClient(api_key='cc0446450bcc4e46a91abd02e33d5f85')
     
     req = request.get_json(silent=True, force=True)
     query_result = req.get('queryResult')
+
     if query_result.get('action') == 'get_stock_price':
         # query_result = req.get('queryResult')
         price_type = query_result.get('parameters').get('price_type')
@@ -94,15 +98,40 @@ def webhook():
             "displayText": '25',
             "source": "webhookdata"
         }
+    
     elif query_result.get('action') == 'get_news':
-        # sources = newsapi.get_sources()
-        # print(sources)
-        print("here")
-        return {
-            "fulfillmentText": "Hellew",
-            "displayText": '25',
-            "source": "webhookdata"
-        }
+        company_name = query_result.get('parameters').get('company_name')
+        all_articles = newsapi.get_everything(q=company_name, sources='bbc-news,the-verge,the-times-of-india',language='en', sort_by='relevancy')
+        articles = all_articles.get('articles')
+        article = articles[random.randint(0, len(articles)-1)]
+        # pprint(article)
+        title = article.get('title')
+        url = article.get('url')
+        url_img = article.get('urlToImage')
+        subtitle = article.get('description')
+
+        response = [{
+                    "card":{
+                    "title": title,
+                    "subtitle": subtitle,
+                    "imageUri":url_img,
+                    "buttons":[
+                    {
+                    "text":"Read Full Story",
+                    "postback":url
+                    },
+                    {
+                    "text":"Get more news",
+                    "postback": "Get more news for {}".format(company_name)
+                    }
+                    ]
+                    },
+                    "platform":"FACEBOOK"
+                    }]
+        
+        return jsonify({
+            "fulfillmentMessages": response
+        })
 
 
 
