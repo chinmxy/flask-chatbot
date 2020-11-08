@@ -34,12 +34,10 @@ def webhook():
         date_time = query_result.get('parameters').get('date-time')
         if isinstance(date_time, str):
             s = date_time.split("T")[0]
-            unix_time = int(time.mktime(datetime.datetime.strptime(s, "%Y-%m-%d").timetuple()))
+            unix_time = int(time.mktime(datetime.datetime.strptime(s, "%Y-%m-%d").timetuple())) + 19800 
         else:
             s = date_time['date_time'].split("T")[0]
-            unix_time = int(time.mktime(datetime.datetime.strptime(s, "%Y-%m-%d").timetuple())) 
-        start_date = unix_time
-        end_date = unix_time + 86399
+            unix_time = int(time.mktime(datetime.datetime.strptime(s, "%Y-%m-%d").timetuple())) + 19800 
         try:
             company_symbol = symbol_data[company_name]
         except:
