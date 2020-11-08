@@ -154,12 +154,15 @@ def webhook():
         }
 
     elif query_result.get('action') == 'get_advances':
-        trade_index = query_result.get('parameters').get('index_code')
+        trade_index = query_result.get('parameters').get('index_codes')
+        advance_type = query_result.get('parameters').get('advance_type')
+
+        print(trade_index)
         if trade_index == '':
             op_string = 'Try again using a valid Index code.'
         else:
             adv_dec = nse.get_advances_declines()
-            print(adv_dec)
+            
             flag = 0
             for i in adv_dec:
                 if i.get('indice') == trade_index:
@@ -170,13 +173,14 @@ def webhook():
             if flag == 0:
                 op_string = "No data of advances/declines for this index was found."
             else:
-                op_string = "The advances of {} are {} and the declines are {}.".format(trade_index, advances, declines)
+                if advance_type == 'advance':
+                    op_string = "The advances of {} are {}.".format(trade_index, advances)
+                else:
+                    op_string = "The declines of {} are {}.".format(trade_index, declines)
             print(op_string)
 
-            
-        
         return {
-            "fulfillmentText": "Hellew",
+            "fulfillmentText": op_string,
             "displayText": '25',
             "source": "webhookdata"
         }
