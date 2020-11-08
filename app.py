@@ -44,7 +44,7 @@ def webhook():
             company_symbol = symbol_data[company_name]
         except:
             return {
-                "fulfillmentText": "Sorry! This company does not belong to NSE.",
+                "fulfillmentText": "Sorry! You need to enter a NSE belonging company.",
                 "displayText": '25',
                 "source": "webhookdata"
             }       
@@ -88,7 +88,7 @@ def webhook():
                     company_list.append(inv_symbol_data[top_losers[i].get('symbol')])
                 company_string = ", ".join(company_list)
                 company_string += " and {}".format(inv_symbol_data[top_losers[number-1].get('symbol')])
-                op_string = "The top {} {}s companies are {}.".format(number, gainer_type, company_string)
+                op_string = "The top {} {}s are {}.".format(number, gainer_type, company_string)
 
 
         
@@ -101,7 +101,7 @@ def webhook():
     
     elif query_result.get('action') == 'get_news':
         company_name = query_result.get('parameters').get('company_name')
-        all_articles = newsapi.get_everything(q=company_name, sources='bbc-news,the-verge,the-times-of-india',language='en', sort_by='relevancy')
+        all_articles = newsapi.get_everything(qintitle=company_name, sources='bbc-news,the-verge,the-times-of-india',language='en', sort_by='relevancy')
         articles = all_articles.get('articles')
         if len(articles) == 0:
             return {
@@ -145,7 +145,7 @@ def webhook():
             op_string = 'Try again using a valid Index code.'
         else:
             index_quote = nse.get_index_quote(index_code).get('lastPrice')
-            op_string = "The last updated price of {} is Rs.{}.".format(index_code, index_quote)
+            op_string = "The last updated price of {} is Rs.{}.".format(index_code.upper(), index_quote)
 
         return {
             "fulfillmentText": op_string,
